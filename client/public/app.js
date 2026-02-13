@@ -94,9 +94,16 @@ createApp({
         updateStatus('waiting', 'Connecting...');
         remoteStatus.value = 'Connecting to partner...';
         
-        setTimeout(() => {
-          createOffer(data.partnerId);
-        }, 100);
+        // Only create offer if we are the initiator
+        // Server will tell us if we should initiate
+        if (data.initiator) {
+          console.log('We are the initiator, creating offer...');
+          setTimeout(() => {
+            createOffer(data.partnerId);
+          }, 500);
+        } else {
+          console.log('Waiting for offer from partner...');
+        }
       });
       
       socket.on('offer', handleOffer);
@@ -197,6 +204,13 @@ createApp({
     // Handle incoming offer
     const handleOffer = async (data) => {
       try {
+        // Clean up any existing connection
+        if (peerConnection) {
+          console.log('Closing existing peer connection');
+          peerConnection.close();
+          peerConnection = null;
+        }
+        
         const pc = createPeerConnection(data.from);
         await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
         
@@ -211,16 +225,29 @@ createApp({
         console.log('Answer sent to', data.from);
       } catch (error) {
         console.error('Error handling offer:', error);
+        handlePartnerDisconnected();
       }
     };
     
     // Handle incoming answer
     const handleAnswer = async (data) => {
       try {
+        if (!peerConnection) {
+          console.error('No peer connection exists when receiving answer');
+          return;
+        }
+        
+        if (peerConnection.signalingState !== 'have-local-offer') {
+          console.error('Invalid state for answer:', peerConnection.signalingState);
+          return;
+        }
+        
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
         console.log('Answer received from', data.from);
       } catch (error) {
         console.error('Error handling answer:', error);
+        // If there's an error, try to reconnect
+        handlePartnerDisconnected();
       }
     };
     

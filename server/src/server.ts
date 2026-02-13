@@ -40,9 +40,10 @@ function matchUsers(user1: User, user2: User): void {
 
   console.log(`Matched ${user1.id} with ${user2.id}`);
 
-  // Notify both users they've been matched
-  user1.socket.emit('matched', { partnerId: user2.id });
-  user2.socket.emit('matched', { partnerId: user1.id });
+  // User1 (who was waiting) becomes the initiator and creates the offer
+  // User2 (who just requested) will wait for the offer
+  user1.socket.emit('matched', { partnerId: user2.id, initiator: true });
+  user2.socket.emit('matched', { partnerId: user1.id, initiator: false });
 }
 
 // Find a random partner for a user
