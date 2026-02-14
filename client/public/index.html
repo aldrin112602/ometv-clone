@@ -1,53 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <!-- Primary Meta Tags -->
     <title>Random Video Chat - Meet New People Online | Free Video Chat</title>
-    <meta name="title" content="Random Video Chat - Meet New People Online | Free Video Chat">
-    <meta name="description" content="Connect with random strangers worldwide through free video chat. Instant matching, anonymous chatting, and skip to next person anytime. No registration required.">
-    <meta name="keywords" content="video chat, random chat, omegle, video call, meet strangers, online chat, webcam chat, free video chat, random video chat, chat with strangers">
+    <meta name="description"
+        content="Connect with random strangers worldwide through free video chat. Instant matching, anonymous chatting, and skip to next person anytime. No registration required.">
+    <meta name="keywords"
+        content="video chat, random chat, omegle alternative, video call, meet strangers, online chat, webcam chat, free video chat, random video chat">
     <meta name="author" content="Aldrin Caballero">
     <meta name="robots" content="index, follow">
-    <meta name="language" content="English">
-    <meta name="revisit-after" content="7 days">
-    
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://ometv-clone-nnkw.onrender.com/">
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ometv-clone-nnkw.onrender.com/">
     <meta property="og:title" content="Random Video Chat - Meet New People Online">
-    <meta property="og:description" content="Connect with random strangers worldwide through free video chat. Instant matching, anonymous chatting, and skip to next person anytime.">
+    <meta property="og:description"
+        content="Connect with random strangers worldwide through free video chat. Instant matching and anonymous chatting.">
     <meta property="og:image" content="https://ometv-clone-nnkw.onrender.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="Random Video Chat">
-    
+    <meta property="og:locale" content="en_US">
+
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://ometv-clone-nnkw.onrender.com/">
-    <meta property="twitter:title" content="Random Video Chat - Meet New People Online">
-    <meta property="twitter:description" content="Connect with random strangers worldwide through free video chat. Instant matching, anonymous chatting, and skip to next person anytime.">
-    <meta property="twitter:image" content="https://ometv-clone-nnkw.onrender.com/twitter-image.jpg">
-    <meta property="twitter:creator" content="@aldrincaballero">
-    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://ometv-clone-nnkw.onrender.com/">
+    <meta name="twitter:title" content="Random Video Chat - Meet New People Online">
+    <meta name="twitter:description"
+        content="Connect with random strangers worldwide through free video chat. Instant matching and anonymous chatting.">
+    <meta name="twitter:image" content="https://ometv-clone-nnkw.onrender.com/twitter-image.jpg">
+    <meta name="twitter:creator" content="@aldrincaballero">
+    <meta name="twitter:site" content="@aldrincaballero">
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://ometv-clone-nnkw.onrender.com/">
-    
+
     <!-- Theme Color -->
     <meta name="theme-color" content="#000000">
     <meta name="msapplication-TileColor" content="#000000">
-    
+
+    <!-- Performance Optimization -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
     {
@@ -60,114 +69,114 @@
         "@type": "Person",
         "name": "Aldrin Caballero"
       },
-      "applicationCategory": "Social Networking",
+      "applicationCategory": "SocialNetworkingApplication",
       "operatingSystem": "Web Browser",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.5",
-        "ratingCount": "1000"
       }
     }
     </script>
-    
+
+    <!-- Basic Styling -->
     <style>
         @keyframes pulse-dot {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
+
         .pulse-animation {
             animation: pulse-dot 2s ease-in-out infinite;
         }
+
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
+
         .spinner {
             animation: spin 1s linear infinite;
         }
-        
-        /* Full screen layout */
-        html, body {
+
+        html,
+        body {
             margin: 0;
             padding: 0;
             height: 100%;
             overflow: hidden;
             background: #000;
         }
-        
+
         #app {
             height: 100vh;
             height: 100dvh;
         }
-        
+
         .video-section {
             flex: 1;
             min-height: 0;
         }
     </style>
 </head>
+
 <body class="bg-black">
     <div id="app">
         <!-- Main Container - Full Screen -->
         <div class="h-full flex flex-col bg-black">
-            
+
             <!-- Header -->
-            <header class="bg-zinc-900 text-white px-3 py-3 sm:px-6 sm:py-3 flex justify-between items-center flex-shrink-0 border-b border-zinc-800">
+            <header
+                class="bg-zinc-900 text-white px-3 py-3 sm:px-6 sm:py-3 flex justify-between items-center flex-shrink-0 border-b border-zinc-800">
                 <div class="flex items-center gap-2 sm:gap-3">
                     <i class="fas fa-video text-lg sm:text-xl text-blue-500"></i>
                     <h1 class="text-base sm:text-lg font-semibold">Video Chat</h1>
                 </div>
                 <div class="flex items-center gap-1.5 sm:gap-2 bg-zinc-800 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
-                    <span 
-                        :class="[
+                    <span :class="[
                             'w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full',
                             statusClass,
                             'pulse-animation'
-                        ]"
-                    ></span>
+                        ]"></span>
                     <span class="text-xs sm:text-sm text-zinc-300">{{ statusText }}</span>
                 </div>
             </header>
 
             <!-- Video Container -->
             <div class="video-section relative bg-black">
-                
+
                 <!-- Remote Video (Partner) -->
                 <div class="absolute inset-0">
-                    <video 
-                        ref="remoteVideo" 
-                        autoplay 
-                        playsinline
-                        :class="['w-full h-full object-cover', remoteVideoActive ? 'block' : 'hidden']"
-                    ></video>
-                    
+                    <video ref="remoteVideo" autoplay playsinline
+                        :class="['w-full h-full object-cover', remoteVideoActive ? 'block' : 'hidden']"></video>
+
                     <!-- Placeholder -->
-                    <div 
-                        v-if="!remoteVideoActive"
-                        class="absolute inset-0 bg-zinc-900 flex items-center justify-center"
-                    >
+                    <div v-if="!remoteVideoActive"
+                        class="absolute inset-0 bg-zinc-900 flex items-center justify-center">
                         <div class="text-center text-zinc-400 px-4">
-                            <div class="w-12 h-12 sm:w-14 sm:h-14 border-3 border-zinc-700 border-t-zinc-400 rounded-full spinner mx-auto mb-3"></div>
+                            <div
+                                class="w-12 h-12 sm:w-14 sm:h-14 border-3 border-zinc-700 border-t-zinc-400 rounded-full spinner mx-auto mb-3">
+                            </div>
                             <p class="text-sm sm:text-base">{{ remoteStatus }}</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Local Video (You) -->
-                <div class="absolute top-3 right-3 sm:top-4 sm:right-4 w-24 h-32 sm:w-32 sm:h-44 md:w-36 md:h-48 rounded-lg overflow-hidden shadow-xl border-2 border-zinc-700 z-10">
-                    <video 
-                        ref="localVideo" 
-                        autoplay 
-                        muted 
-                        playsinline
-                        class="w-full h-full object-cover bg-zinc-900"
-                        style="transform: scaleX(-1);"
-                    ></video>
-                    <div class="absolute bottom-1.5 left-1.5 bg-black/80 text-white px-2 py-1 rounded text-xs font-medium">
+                <div
+                    class="absolute top-3 right-3 sm:top-4 sm:right-4 w-24 h-32 sm:w-32 sm:h-44 md:w-36 md:h-48 rounded-lg overflow-hidden shadow-xl border-2 border-zinc-700 z-10">
+                    <video ref="localVideo" autoplay muted playsinline class="w-full h-full object-cover bg-zinc-900"
+                        style="transform: scaleX(-1);"></video>
+                    <div
+                        class="absolute bottom-1.5 left-1.5 bg-black/80 text-white px-2 py-1 rounded text-xs font-medium">
                         <i class="fas fa-user text-[10px] mr-1"></i> You
                     </div>
                 </div>
@@ -175,49 +184,37 @@
             </div>
 
             <!-- Controls -->
-            <div class="bg-zinc-900 px-3 py-3 sm:px-6 sm:py-4 flex justify-center items-center gap-2 sm:gap-3 border-t border-zinc-800 flex-shrink-0">
-                
+            <div
+                class="bg-zinc-900 px-3 py-3 sm:px-6 sm:py-4 flex justify-center items-center gap-2 sm:gap-3 border-t border-zinc-800 flex-shrink-0">
+
                 <!-- Start/Find Partner Button -->
-                <button 
-                    @click="handleStartButton"
-                    class="flex items-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:px-5 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-                >
+                <button @click="handleStartButton"
+                    class="flex items-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:px-5 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95">
                     <i :class="['fas text-sm', isStarted ? 'fa-search' : 'fa-play']"></i>
                     <span class="hidden sm:inline">{{ isStarted ? 'Find Partner' : 'Start' }}</span>
                     <span class="sm:hidden">{{ isStarted ? 'Find' : 'Start' }}</span>
                 </button>
 
                 <!-- Skip/Next Button -->
-                <button 
-                    @click="skip"
-                    :disabled="!skipEnabled"
-                    class="flex items-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:px-5 sm:py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg text-sm sm:text-base font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
-                >
+                <button @click="skip" :disabled="!skipEnabled"
+                    class="flex items-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:px-5 sm:py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg text-sm sm:text-base font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95">
                     <i class="fas fa-forward text-sm"></i>
                     <span class="hidden sm:inline">Next</span>
                 </button>
 
                 <!-- Toggle Video Button -->
-                <button 
-                    @click="toggleVideo"
-                    :class="[
+                <button @click="toggleVideo" :class="[
                         'flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-lg font-medium transition-colors active:scale-95',
                         isVideoEnabled ? 'bg-zinc-700 hover:bg-zinc-600 text-white' : 'bg-zinc-800 text-zinc-500'
-                    ]"
-                    :title="isVideoEnabled ? 'Disable Video' : 'Enable Video'"
-                >
+                    ]" :title="isVideoEnabled ? 'Disable Video' : 'Enable Video'">
                     <i :class="['fas text-sm', isVideoEnabled ? 'fa-video' : 'fa-video-slash']"></i>
                 </button>
 
                 <!-- Toggle Audio Button -->
-                <button 
-                    @click="toggleAudio"
-                    :class="[
+                <button @click="toggleAudio" :class="[
                         'flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-lg font-medium transition-colors active:scale-95',
                         isAudioEnabled ? 'bg-zinc-700 hover:bg-zinc-600 text-white' : 'bg-zinc-800 text-zinc-500'
-                    ]"
-                    :title="isAudioEnabled ? 'Mute' : 'Unmute'"
-                >
+                    ]" :title="isAudioEnabled ? 'Mute' : 'Unmute'">
                     <i :class="['fas text-sm', isAudioEnabled ? 'fa-microphone' : 'fa-microphone-slash']"></i>
                 </button>
 
@@ -228,11 +225,12 @@
 
     <!-- Vue 3 CDN -->
     <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.js"></script>
-    
+
     <!-- Socket.io -->
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    
+
     <!-- App Script -->
     <script src="app.js"></script>
 </body>
+
 </html>
