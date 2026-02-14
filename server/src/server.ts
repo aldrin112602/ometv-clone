@@ -141,6 +141,15 @@ io.on('connection', (socket: Socket) => {
     });
   });
 
+  // Handle chat messages
+  socket.on('chat-message', (data: { to: string, message: string }) => {
+    console.log(`Chat from ${socket.id} to ${data.to}: ${data.message}`);
+    io.to(data.to).emit('chat-message', {
+      message: data.message,
+      from: socket.id
+    });
+  });
+
   // Handle skip/next button
   socket.on('skip', () => {
     console.log(`User ${socket.id} skipped partner`);

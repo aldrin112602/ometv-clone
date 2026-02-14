@@ -17,6 +17,16 @@ createApp({
     const isAudioEnabled = ref(true);
     const onlineCount = ref('-');
     
+    // Chat state
+    const chatVisible = ref(false);
+    const messages = ref([]);
+    const messageInput = ref('');
+    const unreadMessages = ref(0);
+    const messagesContainer = ref(null);
+    
+    // Camera state
+    const currentFacingMode = ref('user'); // 'user' = front, 'environment' = back
+    
     // WebRTC
     let socket = null;
     let localStream = null;
@@ -55,7 +65,7 @@ createApp({
         
         // Get user media
         localStream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: { facingMode: currentFacingMode.value },
           audio: true
         });
         
@@ -131,6 +141,26 @@ createApp({
       socket.on('ice-candidate', handleIceCandidate);
       
       socket.on('partner-disconnected', handlePartnerDisconnected);
+      
+      socket.on('chat-message', (data) => {
+        console.log('Received message:', data.message);
+        messages.value.push({
+          sender: 'stranger',
+          text: data.message
+        });
+        
+        // Show unread count if chat is hidden
+        if (!chatVisible.value) {
+          unreadMessages.value++;
+        }
+        
+        // Auto-scroll to bottom
+        setTimeout(() => {
+          if (messagesContainer.value) {
+            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+          }
+        }, 100);
+      });
     };
     
     // Update status
@@ -333,6 +363,10 @@ createApp({
       remoteVideoActive.value = false;
       remoteStatus.value = 'Partner disconnected';
       
+      // Clear chat messages
+      messages.value = [];
+      unreadMessages.value = 0;
+      
       updateStatus('waiting', 'Partner left');
       
       // Auto-search for new partner after 2 seconds
@@ -358,6 +392,10 @@ createApp({
       remoteVideoActive.value = false;
       remoteStatus.value = 'Finding a new partner...';
       
+      // Clear chat messages
+      messages.value = [];
+      unreadMessages.value = 0;
+      
       updateStatus('waiting', 'Searching...');
       socket.emit('skip');
     };
@@ -380,6 +418,93 @@ createApp({
           track.enabled = isAudioEnabled.value;
         });
       }
+    };
+    
+    // Switch camera (front/back)
+    const switchCamera = async () => {
+      try {
+        // Toggle facing mode
+        currentFacingMode.value = currentFacingMode.value === 'user' ? 'environment' : 'user';
+        
+        // Stop current stream
+        if (localStream) {
+          localStream.getTracks().forEach(track => track.stop());
+        }
+        
+        // Get new stream with switched camera
+        localStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: currentFacingMode.value },
+          audio: true
+        });
+        
+        // Update local video
+        localVideo.value.srcObject = localStream;
+        
+        // If in a call, replace video track
+        if (peerConnection && currentPartnerId) {
+          const videoTrack = localStream.getVideoTracks()[0];
+          const sender = peerConnection.getSenders().find(s => s.track?.kind === 'video');
+          if (sender) {
+            sender.replaceTrack(videoTrack);
+          }
+        }
+        
+        console.log('Camera switched to:', currentFacingMode.value);
+      } catch (error) {
+        console.error('Error switching camera:', error);
+        alert('Could not switch camera. Make sure your device has multiple cameras.');
+      }
+    };
+    
+    // Toggle chat visibility
+    const toggleChat = () => {
+      chatVisible.value = !chatVisible.value;
+      
+      // Clear unread count when opening chat
+      if (chatVisible.value) {
+        unreadMessages.value = 0;
+        
+        // Auto-scroll to bottom
+        setTimeout(() => {
+          if (messagesContainer.value) {
+            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+          }
+        }, 100);
+      }
+    };
+    
+    // Send message
+    const sendMessage = () => {
+      const text = messageInput.value.trim();
+      
+      if (!text) return;
+      
+      if (!currentPartnerId) {
+        alert('Connect with someone first!');
+        return;
+      }
+      
+      // Add to local messages
+      messages.value.push({
+        sender: 'you',
+        text: text
+      });
+      
+      // Send via socket
+      socket.emit('chat-message', {
+        to: currentPartnerId,
+        message: text
+      });
+      
+      // Clear input
+      messageInput.value = '';
+      
+      // Auto-scroll to bottom
+      setTimeout(() => {
+        if (messagesContainer.value) {
+          messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+        }
+      }, 100);
     };
     
     // Lifecycle hooks
@@ -405,6 +530,7 @@ createApp({
       // Refs
       localVideo,
       remoteVideo,
+      messagesContainer,
       
       // State
       statusText,
@@ -417,11 +543,20 @@ createApp({
       isAudioEnabled,
       onlineCount,
       
+      // Chat state
+      chatVisible,
+      messages,
+      messageInput,
+      unreadMessages,
+      
       // Methods
       handleStartButton,
       skip,
       toggleVideo,
-      toggleAudio
+      toggleAudio,
+      switchCamera,
+      toggleChat,
+      sendMessage
     };
   }
 }).mount('#app');
