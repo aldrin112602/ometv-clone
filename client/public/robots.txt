@@ -1,0 +1,13 @@
+# robots.txt for Random Video Chat
+# Author: Aldrin Caballero
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /socket.io/
+
+# Sitemap
+Sitemap: https://ometv-clone-nnkw.onrender.com/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
