@@ -15,6 +15,7 @@ createApp({
     const skipEnabled = ref(false);
     const isVideoEnabled = ref(true);
     const isAudioEnabled = ref(true);
+    const isSoundEnabled = ref(true); // Sound notifications
     const onlineCount = ref('-');
     
     // Chat state
@@ -26,6 +27,73 @@ createApp({
     
     // Camera state
     const currentFacingMode = ref('user'); // 'user' = front, 'environment' = back
+    
+    // Audio Context for sound notifications
+    let audioContext = null;
+    
+    // Initialize Audio Context
+    const initAudioContext = () => {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    };
+    
+    // Play notification sound
+    const playSound = (type) => {
+      if (!isSoundEnabled.value) return; // Don't play if muted
+      
+      initAudioContext();
+      
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Different sounds for different events
+      switch(type) {
+        case 'matched':
+          // Happy ascending tone
+          oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+          oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+          oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+          gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.3);
+          break;
+          
+        case 'connected':
+          // Success tone (two beeps)
+          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+          oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.15);
+          gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.3);
+          break;
+          
+        case 'disconnected':
+          // Sad descending tone
+          oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
+          oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime + 0.1); // C5
+          oscillator.frequency.setValueAtTime(392.00, audioContext.currentTime + 0.2); // G4
+          gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.3);
+          break;
+          
+        case 'message':
+          // Quick tick sound
+          oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
+          gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.1);
+          break;
+      }
+    };
     
     // WebRTC
     let socket = null;
@@ -106,6 +174,9 @@ createApp({
         updateStatus('waiting', 'Connecting...');
         remoteStatus.value = 'Connecting to partner...';
         
+        // Play matched sound
+        playSound('matched');
+        
         // Check if initiator flag exists (from updated server)
         if (data.initiator === undefined) {
           console.warn('⚠️ Server not updated! Using fallback - both will try to create offer');
@@ -148,6 +219,9 @@ createApp({
           sender: 'stranger',
           text: data.message
         });
+        
+        // Play message sound
+        playSound('message');
         
         // Show unread count if chat is hidden
         if (!chatVisible.value) {
@@ -209,6 +283,9 @@ createApp({
         remoteVideo.value.srcObject = event.streams[0];
         remoteVideoActive.value = true;
         updateStatus('connected', 'Connected');
+        
+        // Play connected sound
+        playSound('connected');
       };
       
       // Handle ICE candidates
@@ -369,6 +446,9 @@ createApp({
       
       updateStatus('waiting', 'Partner left');
       
+      // Play disconnected sound
+      playSound('disconnected');
+      
       // Auto-search for new partner after 2 seconds
       setTimeout(() => {
         if (!currentPartnerId) {
@@ -417,6 +497,16 @@ createApp({
         localStream.getAudioTracks().forEach(track => {
           track.enabled = isAudioEnabled.value;
         });
+      }
+    };
+    
+    // Toggle sound notifications
+    const toggleSound = () => {
+      isSoundEnabled.value = !isSoundEnabled.value;
+      
+      // Play a test sound when enabling
+      if (isSoundEnabled.value) {
+        playSound('message');
       }
     };
     
@@ -541,6 +631,7 @@ createApp({
       skipEnabled,
       isVideoEnabled,
       isAudioEnabled,
+      isSoundEnabled,
       onlineCount,
       
       // Chat state
@@ -554,6 +645,7 @@ createApp({
       skip,
       toggleVideo,
       toggleAudio,
+      toggleSound,
       switchCamera,
       toggleChat,
       sendMessage
