@@ -15,6 +15,15 @@ app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 // Serve static files from client directory
 app.use(express_1.default.static(path_1.default.join(__dirname, '../../client/public')));
+// Specific routes for SEO files with correct content types
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.sendFile(path_1.default.join(__dirname, '../../client/public/robots.txt'));
+});
+app.get('/sitemap.xml', (req, res) => {
+    res.type('application/xml');
+    res.sendFile(path_1.default.join(__dirname, '../../client/public/sitemap.xml'));
+});
 const io = new socket_io_1.Server(httpServer, {
     cors: {
         origin: "*",

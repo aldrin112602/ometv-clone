@@ -14,6 +14,17 @@ app.use(express.json());
 // Serve static files from client directory
 app.use(express.static(path.join(__dirname, '../../client/public')));
 
+// Specific routes for SEO files with correct content types
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.sendFile(path.join(__dirname, '../../client/public/robots.txt'));
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml');
+  res.sendFile(path.join(__dirname, '../../client/public/sitemap.xml'));
+});
+
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
@@ -59,10 +70,10 @@ function findPartner(user: User): void {
     // Get a random waiting user
     const randomIndex = Math.floor(Math.random() * waitingUsers.length);
     const partner = waitingUsers[randomIndex];
-    
+
     // Remove partner from waiting list
     waitingUsers.splice(randomIndex, 1);
-    
+
     // Match them
     matchUsers(user, partner);
   } else {
@@ -77,13 +88,13 @@ function findPartner(user: User): void {
 function disconnectFromPartner(user: User): void {
   if (user.partnerId) {
     const partner = connectedUsers.get(user.partnerId);
-    
+
     if (partner) {
       // Notify partner
       partner.socket.emit('partner-disconnected');
       partner.partnerId = undefined;
     }
-    
+
     user.partnerId = undefined;
   }
 }
@@ -153,10 +164,10 @@ io.on('connection', (socket: Socket) => {
   // Handle skip/next button
   socket.on('skip', () => {
     console.log(`User ${socket.id} skipped partner`);
-    
+
     // Disconnect from current partner
     disconnectFromPartner(user);
-    
+
     // Find new partner
     findPartner(user);
   });
@@ -164,13 +175,13 @@ io.on('connection', (socket: Socket) => {
   // Handle disconnect
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.id}`);
-    
+
     // Disconnect from partner if any
     disconnectFromPartner(user);
-    
+
     // Remove from waiting list
     removeFromWaiting(socket.id);
-    
+
     // Remove from connected users
     connectedUsers.delete(socket.id);
   });

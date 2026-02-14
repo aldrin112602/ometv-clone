@@ -3,11 +3,12 @@
 
 User-agent: *
 Allow: /
-Disallow: /api/
+
+# Disallow WebSocket connections (not crawlable anyway)
 Disallow: /socket.io/
 
 # Sitemap
 Sitemap: https://ometv-clone-nnkw.onrender.com/sitemap.xml
 
-# Crawl-delay
+# Crawl-delay (be nice to crawlers)
 Crawl-delay: 10
