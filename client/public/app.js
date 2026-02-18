@@ -25,6 +25,146 @@ createApp({
     const unreadMessages = ref(0);
     const messagesContainer = ref(null);
 
+    // Filter state
+    const filtersVisible = ref(false);
+    const activePreset = ref("Normal");
+    const filters = ref({
+      brightness: 100,
+      contrast: 100,
+      saturate: 100,
+      blur: 0,
+      grayscale: 0,
+      sepia: 0,
+      hue: 0,
+      invert: 0,
+      opacity: 100,
+    });
+
+    // Filter debounce timer
+    let filterDebounce = null;
+
+    // Filter controls configuration
+    const filterControls = ref([
+      {
+        name: "brightness",
+        label: "Brightness",
+        min: 0,
+        max: 200,
+        step: 1,
+        unit: "%",
+      },
+      {
+        name: "contrast",
+        label: "Contrast",
+        min: 0,
+        max: 200,
+        step: 1,
+        unit: "%",
+      },
+      {
+        name: "saturate",
+        label: "Saturation",
+        min: 0,
+        max: 200,
+        step: 1,
+        unit: "%",
+      },
+      { name: "blur", label: "Blur", min: 0, max: 10, step: 0.1, unit: "px" },
+      {
+        name: "grayscale",
+        label: "Grayscale",
+        min: 0,
+        max: 100,
+        step: 1,
+        unit: "%",
+      },
+      { name: "sepia", label: "Sepia", min: 0, max: 100, step: 1, unit: "%" },
+      { name: "hue", label: "Hue", min: 0, max: 360, step: 1, unit: "°" },
+      { name: "invert", label: "Invert", min: 0, max: 100, step: 1, unit: "%" },
+    ]);
+
+    // Filter presets
+    const filterPresets = ref([
+      {
+        name: "Normal",
+        filters: {
+          brightness: 100,
+          contrast: 100,
+          saturate: 100,
+          blur: 0,
+          grayscale: 0,
+          sepia: 0,
+          hue: 0,
+          invert: 0,
+        },
+      },
+      {
+        name: "Vintage",
+        filters: {
+          brightness: 110,
+          contrast: 90,
+          saturate: 80,
+          blur: 0,
+          grayscale: 0,
+          sepia: 40,
+          hue: 10,
+          invert: 0,
+        },
+      },
+      {
+        name: "B&W",
+        filters: {
+          brightness: 100,
+          contrast: 120,
+          saturate: 0,
+          blur: 0,
+          grayscale: 100,
+          sepia: 0,
+          hue: 0,
+          invert: 0,
+        },
+      },
+      {
+        name: "Dramatic",
+        filters: {
+          brightness: 90,
+          contrast: 150,
+          saturate: 120,
+          blur: 0,
+          grayscale: 0,
+          sepia: 0,
+          hue: 0,
+          invert: 0,
+        },
+      },
+      {
+        name: "Warm",
+        filters: {
+          brightness: 110,
+          contrast: 100,
+          saturate: 110,
+          blur: 0,
+          grayscale: 0,
+          sepia: 20,
+          hue: 20,
+          invert: 0,
+        },
+      },
+      {
+        name: "Cool",
+        filters: {
+          brightness: 100,
+          contrast: 100,
+          saturate: 90,
+          blur: 0,
+          grayscale: 0,
+          sepia: 0,
+          hue: 200,
+          invert: 0,
+        },
+      },
+    ]);
+
     // Camera state
     const currentFacingMode = ref("user"); // 'user' = front, 'environment' = back
 
@@ -267,6 +407,11 @@ createApp({
           }
         }, 100);
       });
+
+      socket.on("filter-change", (data) => {
+        console.log("Received filter change from partner");
+        applyFiltersToVideo(remoteVideo.value, data.filters);
+      });
     };
 
     // Update status
@@ -472,6 +617,13 @@ createApp({
     const handlePartnerDisconnected = () => {
       console.log("Partner disconnected");
 
+
+      // Reset filters when partner disconnects
+      filters.value = { brightness: 100, contrast: 100, saturate: 100, blur: 0, grayscale: 0, sepia: 0, hue: 0, invert: 0 };
+      activePreset.value = 'Normal';
+      applyFiltersToVideo(localVideo.value, filters.value);
+      applyFiltersToVideo(remoteVideo.value, filters.value);
+
       if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
@@ -665,6 +817,61 @@ createApp({
       }
     });
 
+    // Apply filters to video element
+    const applyFiltersToVideo = (videoElement, filterValues) => {
+      if (!videoElement) return;
+
+      const filterString = `
+    brightness(${filterValues.brightness}%)
+    contrast(${filterValues.contrast}%)
+    saturate(${filterValues.saturate}%)
+    blur(${filterValues.blur}px)
+    grayscale(${filterValues.grayscale}%)
+    sepia(${filterValues.sepia}%)
+    hue-rotate(${filterValues.hue}deg)
+    invert(${filterValues.invert}%)
+  `
+        .trim()
+        .replace(/\s+/g, " ");
+
+      videoElement.style.filter = filterString;
+    };
+
+    // Handle filter change
+    const onFilterChange = () => {
+      // Apply to local video immediately
+      applyFiltersToVideo(localVideo.value, filters.value);
+
+      // Debounce socket emit to partner
+      clearTimeout(filterDebounce);
+      filterDebounce = setTimeout(() => {
+        if (currentPartnerId) {
+          socket.emit("filter-change", {
+            to: currentPartnerId,
+            filters: filters.value,
+          });
+        }
+      }, 300); // 300ms debounce
+    };
+
+    // Toggle filters panel
+    const toggleFilters = () => {
+      filtersVisible.value = !filtersVisible.value;
+    };
+
+    // Apply filter preset
+    const applyFilterPreset = (preset) => {
+      activePreset.value = preset.name;
+      filters.value = { ...preset.filters };
+      onFilterChange();
+    };
+
+    // Reset filters to default
+    const resetFilters = () => {
+      const defaultPreset = filterPresets.value[0]; // Normal
+      applyFilterPreset(defaultPreset);
+    };
+
     return {
       // Refs
       localVideo,
@@ -698,6 +905,19 @@ createApp({
       switchCamera,
       toggleChat,
       sendMessage,
+
+      // Filter state
+      filtersVisible,
+      filters,
+      filterControls,
+      filterPresets,
+      activePreset,
+
+      // Filter methods
+      toggleFilters,
+      onFilterChange,
+      applyFilterPreset,
+      resetFilters,
     };
   },
 }).mount("#app");

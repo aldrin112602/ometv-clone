@@ -133,6 +133,14 @@ io.on('connection', (socket) => {
             from: socket.id
         });
     });
+    // Handle video filter changes
+    socket.on('filter-change', (data) => {
+        console.log(`Filter change from ${socket.id} to ${data.to}`);
+        io.to(data.to).emit('filter-change', {
+            filters: data.filters,
+            from: socket.id
+        });
+    });
     // Handle skip/next button
     socket.on('skip', () => {
         console.log(`User ${socket.id} skipped partner`);
